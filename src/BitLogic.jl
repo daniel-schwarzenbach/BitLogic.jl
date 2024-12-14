@@ -1,9 +1,13 @@
 
 module BitLogic
 
+export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣
+
 """
 ```
-Bit <: Integer
+    struct Bit <: Integer
+    Bit(value::Integer)
+    Bit(value::Bool)
 ```
 Bit = {0,1}  ⟺  Bool = {false,true}
 
@@ -134,10 +138,10 @@ julia> f(a,b) = a → ¬b; print(truth_table(f))
 ```
 output:
 ```
-f(0, 0) = 0
+f(0, 0) = 1
 f(1, 0) = 1
 f(0, 1) = 1
-f(1, 1) = 1
+f(1, 1) = 0
 ```
 """
 function truth_table(fn::Function) ::String
@@ -158,31 +162,31 @@ end
 export truth_table
 
 
+
 """
 ```
-≡: ((Bit^n -> Any),(Bit^m -> Any)) -> Bool
-(f1,f2) ↦ f1 ≡ f2
+≣: ((Bit^n -> Any),(Bit^m -> Any)) -> Bool
+(f1,f2) ↦ f1 ≣ f2
 ```
 retruns true only if for all inputs f1 and f2 you get the same output
 """
-function ≡(f1::Function, f2::Function) ::Bool
-     # Get the number of arguments for the first method of each function
-     n = length(first(methods(f1)).sig.parameters) - 1
-     n2 = length(first(methods(f2)).sig.parameters) - 1
- 
-     # Check if the number of arguments is the same
-     if n != n2
-         return false
-     end
-    # Generate all combinations of true/false for `n` arguments
-    combinations = Iterators.product(fill((Bit(0), Bit(1)), n)...)
-    for inputs in combinations
-        if f1(inputs...) != f2(inputs...)
-            return false
-        end
-    end
-    return true
-end
+function ≣(f1::Function, f2::Function) ::Bool
+    # Get the number of arguments for the first method of each function
+    n = length(first(methods(f1)).sig.parameters) - 1
+    n2 = length(first(methods(f2)).sig.parameters) - 1
 
+    # Check if the number of arguments is the same
+    if n != n2
+        return false
+    end
+   # Generate all combinations of true/false for `n` arguments
+   combinations = Iterators.product(fill((Bit(0), Bit(1)), n)...)
+   for inputs in combinations
+       if f1(inputs...) != f2(inputs...)
+           return false
+       end
+   end
+   return true
+end
 
 end
