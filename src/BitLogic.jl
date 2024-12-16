@@ -1,48 +1,7 @@
-"""
-The BitLogic module provides a custom `Bit` type and implements standard logical operators for bitwise operations. 
-It allows for logical operations using a `Bit` type, which is a subtype of `Integer` and can represent boolean values 
-as `0` and `1`. This module is designed to be used as a replacement for the `Bool` type in logical expressions.
-
-# Features
-
-- **Bit Type**: A custom type `Bit` that can be initialized with `0`, `1`, or `Bool` values (`true` or `false`).
-- **Logical Operators**: Implements standard logical operators such as `¬` (Not), `∧` (And), `∨` (Or), `↑` (Nand), `↓` (Nor), 
-  `⊕` (Xor), `→` (Right Implication), `←` (Left Implication), and `↔` (Equivalence).
-- **Truth Table Generation**: A function `truth_table` that generates and prints a truth table for a given logical function.
-- **Function Equivalence**: A function `≣` that checks if two logical functions produce the same output for all possible inputs.
-
-# Usage
-
-- Initialize `Bit` values:
-  ```julia
-  a = Bit(0)
-  b::Bit = 1
-  d::Bit = true
-  ```
-- Perform logical operations:
-```
-a ∧ b  # And operation
-a ∨ b  # Or operation
-¬a     # Not operation
-```
-- Generate a truth table for a logical function:
-```
-f(a, b) = a → ¬b
-println(truth_table(f))
-```
-- Check equivalence of two functions:
-```
-f1(a, b) = a ∧ b
-f2(a, b) = b ∧ a
-println(f1 ≣ f2)  # true
-```
-This module is useful for applications requiring custom logical 
-    operations and truth table analysis.
-"""
 module BitLogic
 
 
-export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣
+export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣, I, O
 
 """
 ```
@@ -50,7 +9,7 @@ export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣
     Bit(value::Integer)
     Bit(value::Bool)
 ```
-Bit = {0,1}  ⟺  Bool = {false,true}
+Bit = {O,I}  ⟺  Bool = {false,true}
 
 Standard logical operators `¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔` are defined.
 
@@ -60,20 +19,22 @@ a = Bit(0)
 b::Bit = 1
 c::Bit = 2 # will raise an error!!
 d::Bit = true
+e= I
+f = O
 ```
 operators:
 ```
-a::Bit = 0
-b::Bit = 1
-¬a     # Not ; ¬         ; = 1
-a ∧ b  # And ; \\wedge    ; = 0
-a ∨ b  # Or  ; \\vee      ; = 1
-a ↑ b  # Nand; |         ; = 1
-a ↓ b  # Nor ; \\downarrow; = 0
-a ⊕ b  # Xor ; \\oplus    ; = 1
-a → b  # RightImplication; \\rightarrow     ; = 1
-a ← b  # LeftImplication;  \\leftarrow      ; = 0  
-a ↔ b  # Eqivalence;       \\leftrightarrow ; = 0
+a::Bit = O
+b::Bit = I
+¬a     # Not ; ¬         ; = I
+a ∧ b  # And ; \\wedge    ; = O
+a ∨ b  # Or  ; \\vee      ; = I
+a ↑ b  # Nand; |         ; = I
+a ↓ b  # Nor ; \\downarrow; = O
+a ⊕ b  # Xor ; \\oplus    ; = I
+a → b  # RightImplication; \\rightarrow     ; = I
+a ← b  # LeftImplication;  \\leftarrow      ; = O 
+a ↔ b  # Eqivalence;       \\leftrightarrow ; = O
 ```
 usage:
 is usable as Bool replacement
@@ -96,12 +57,18 @@ end
 export Bit
 
 function Base.show(io::IO, b::Bit)
-    print(io, Int(b.set))
+    s = "O"
+    if (b.set); s = "I"; end
+    print(io, s)
 end
 
 Base.convert(::Type{Bool}, b::Bit) = b.set
 Base.convert(::Type{Bit}, a::Integer) = Bit(a)
 Base.Bool(b::Bit) = b.set
+
+const global I::Bit = 1
+const global O::Bit = 0
+export I,O
 
 #import Base.:¬, :∧, :∨, :↓, :↑, :⊕, :←, :→, :↔ # do not redefine
 "Not"
@@ -179,10 +146,10 @@ julia> f(a,b) = a → ¬b; print(truth_table(f))
 ```
 output:
 ```
-f(0, 0) = 1
-f(1, 0) = 1
-f(0, 1) = 1
-f(1, 1) = 0
+f(O, O) = I
+f(I, O) = I
+f(O, I) = I
+f(I, I) = O
 ```
 """
 function truth_table(fn::Function) ::String
@@ -191,7 +158,8 @@ function truth_table(fn::Function) ::String
     combinations = Iterators.product(fill((Bit(0), Bit(1)), n)...)
     # Initialize an empty string to accumulate results
     result_string = ""
-    # Evaluate the function for each combination and append it to the result string
+    # Evaluate the function for each combination and append it to the 
+    # result string
     for inputs in combinations
         result = fn(inputs...)
         result_string *= "$fn($(join(inputs, ", "))) = $result\n"

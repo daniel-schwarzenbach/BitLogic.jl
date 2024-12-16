@@ -1,14 +1,13 @@
 # BitLogic
 
-The BitLogic module provides a custom `Bit` type and implements standard logical operators for bitwise operations. 
-It allows for logical operations using a `Bit` type, which is a subtype of `Integer` and can represent boolean values 
-as `0` and `1`. This module is designed to be used as a replacement for the `Bool` type in logical expressions.
+The BitLogic module provides a custom `Bit` type and implements standard logical operators for bitwise operations.
+
+It allows for logical operations using a `Bit` type, which is a subtype of `Integer` and can represent boolean values as `O` and `I`.
 
 # Features
 
 - **Bit Type**: A custom type `Bit` that can be initialized with `0`, `1`, or `Bool` values (`true` or `false`).
-- **Logical Operators**: Implements standard logical operators such as `¬` (Not), `∧` (And), `∨` (Or), `↑` (Nand), `↓` (Nor), 
-  `⊕` (Xor), `→` (Right Implication), `←` (Left Implication), and `↔` (Equivalence).
+- **Logical Operators**: Implements standard logical operators such as `¬` (Not), `∧` (And), `∨` (Or), `↑` (Nand), `↓` (Nor), `⊕` (Xor), `→` (Right Implication), `←` (Left Implication), and `↔` (Equivalence).
 - **Truth Table Generation**: A function `truth_table` that generates and prints a truth table for a given logical function.
 - **Function Equivalence**: A function `≣` that checks if two logical functions produce the same output for all possible inputs.
 
@@ -16,9 +15,11 @@ as `0` and `1`. This module is designed to be used as a replacement for the `Boo
 
 - Initialize `Bit` values:
   ```julia
-  a = Bit(0)
+  a = I
   b::Bit = 1
   d::Bit = true
+  Byte::DataType = NTuple{8,Bit}
+  _7_::Byte = (O,O,O,O,O,I,I,I)
   ```
 - Perform logical operations:
 ```julia
