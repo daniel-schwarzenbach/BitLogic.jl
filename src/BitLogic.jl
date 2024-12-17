@@ -56,8 +56,8 @@ end
 export Bit
 
 function Base.show(io::IO, b::Bit)
-    s = "𝟎"
-    if (b.set); s = "𝟏"; end
+    s = "0"
+    if (b.set); s = "1"; end
     print(io, s)
 end
 
