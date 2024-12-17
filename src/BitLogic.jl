@@ -1,15 +1,14 @@
 module BitLogic
 
 
-export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣, I, O
-
+export Bit, ¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔, truth_table, ≣, 𝟏, 𝟎
 """
 ```
     struct Bit <: Integer
     Bit(value::Integer)
     Bit(value::Bool)
 ```
-Bit = {O,I}  ⟺  Bool = {false,true}
+Bit = {𝟎,𝟏}  ⟺  Bool = {false,true}
 
 Standard logical operators `¬, ∧, ∨, ↑, ↓, ⊕, →, ←, ↔` are defined.
 
@@ -19,22 +18,22 @@ a = Bit(0)
 b::Bit = 1
 c::Bit = 2 # will raise an error!!
 d::Bit = true
-e= I
-f = O
+e = 𝟏 #\bfone
+f = 𝟎 #\bfzero
 ```
 operators:
 ```
-a::Bit = O
-b::Bit = I
-¬a     # Not ; ¬         ; = I
-a ∧ b  # And ; \\wedge    ; = O
-a ∨ b  # Or  ; \\vee      ; = I
-a ↑ b  # Nand; |         ; = I
-a ↓ b  # Nor ; \\downarrow; = O
-a ⊕ b  # Xor ; \\oplus    ; = I
-a → b  # RightImplication; \\rightarrow     ; = I
-a ← b  # LeftImplication;  \\leftarrow      ; = O 
-a ↔ b  # Eqivalence;       \\leftrightarrow ; = O
+a::Bit = 𝟎
+b::Bit = 𝟏
+¬a     # Not ; ¬         ; = 𝟏
+a ∧ b  # And ; \\wedge    ; = 𝟎
+a ∨ b  # Or  ; \\vee      ; = 𝟏
+a ↑ b  # Nand; |         ; = 𝟏
+a ↓ b  # Nor ; \\downarrow; = 𝟎
+a ⊕ b  # Xor ; \\oplus    ; = 𝟏
+a → b  # RightImplication; \\rightarrow     ; = 𝟏
+a ← b  # LeftImplication;  \\leftarrow      ; = 𝟎
+a ↔ b  # Eqivalence;       \\leftrightarrow ; = 𝟎
 ```
 usage:
 is usable as Bool replacement
@@ -57,8 +56,8 @@ end
 export Bit
 
 function Base.show(io::IO, b::Bit)
-    s = "O"
-    if (b.set); s = "I"; end
+    s = "𝟎"
+    if (b.set); s = "𝟏"; end
     print(io, s)
 end
 
@@ -66,9 +65,34 @@ Base.convert(::Type{Bool}, b::Bit) = b.set
 Base.convert(::Type{Bit}, a::Integer) = Bit(a)
 Base.Bool(b::Bit) = b.set
 
-const global I::Bit = 1
-const global O::Bit = 0
-export I,O
+function Base.convert(::Type{Vector{Bit}}, intN::IntN) where IntN <: Integer
+    N = sizeof(IntN)*8
+    bitVec::Vector{Bit} = zeros(Bit,(N))
+    for i ∈ 0:(N-1)
+        bitVec[N-i] = (((1 << i) & intN) != 0)
+    end
+    return bitVec
+end
+
+function Base.convert(::Type{IntN}, bitVec::Vector{Bit}) where IntN <: Integer
+    N = length(bitVec)
+    if sizeof(IntN)*8 < N; throw(InexactError(Integer,"Can't fit whole Vector{Bit} inside")); end
+    intN::IntN = 0
+    for i ∈ 0:(N-1)
+        if (bitVec[N-i].set)
+            # flip ith bit
+            intN = intN ⊻ (1 << i)
+        end
+    end
+    return intN
+end
+
+Base.Vector{Bit}(intN::Integer) = convert(Vector{Bit},intN)
+Base.Integer(bitVec::Vector{Bit}) = convert(Integer, bitVec) 
+
+
+const global 𝟏::Bit = 1
+const global 𝟎::Bit = 0
 
 #import Base.:¬, :∧, :∨, :↓, :↑, :⊕, :←, :→, :↔ # do not redefine
 "Not"
