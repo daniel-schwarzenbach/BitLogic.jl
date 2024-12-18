@@ -69,7 +69,7 @@ function Base.convert(::Type{Vector{Bit}}, intN::IntN) where IntN <: Integer
     N = sizeof(IntN)*8
     bitVec::Vector{Bit} = zeros(Bit,(N))
     for i ∈ 0:(N-1)
-        bitVec[N-i] = (((1 << i) & intN) != 0)
+        bitVec[i+1] = (((1 << i) & intN) != 0)
     end
     return bitVec
 end
@@ -79,7 +79,7 @@ function Base.convert(::Type{IntN}, bitVec::Vector{Bit}) where IntN <: Integer
     if sizeof(IntN)*8 < N; throw(InexactError(Integer,"Can't fit whole Vector{Bit} inside")); end
     intN::IntN = 0
     for i ∈ 0:(N-1)
-        if (bitVec[N-i].set)
+        if (bitVec[i+1].set)
             # flip ith bit
             intN = intN ⊻ (1 << i)
         end
@@ -90,6 +90,8 @@ end
 Base.Vector{Bit}(intN::Integer) = convert(Vector{Bit},intN)
 Base.Integer(bitVec::Vector{Bit}) = convert(Integer, bitVec) 
 
+Base.UInt(bitVec::Vector{Bit}) = UInt(convert(UInt,bitVec))
+Base.Int(bitVec::Vector{Bit}) = Int(convert(Int,bitVec))
 
 const global 𝟏::Bit = 1
 const global 𝟎::Bit = 0
@@ -170,10 +172,10 @@ julia> f(a,b) = a → ¬b; print(truth_table(f))
 ```
 output:
 ```
-f(O, O) = I
-f(I, O) = I
-f(O, I) = I
-f(I, I) = O
+f(0, 0) = 1
+f(1, O) = 1
+f(O, 1) = 1
+f(1, 1) = O
 ```
 """
 function truth_table(fn::Function) ::String

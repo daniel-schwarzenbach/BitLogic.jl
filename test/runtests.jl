@@ -18,5 +18,5 @@ using Test
     bitvec::Vector{Bit} =  0b0111
     println(bitvec)
     d::Int = bitvec
-    @test d == 7
+    @test Int(bitvec) == 7
 end
